@@ -1,7 +1,8 @@
 @page "/users"
 @using BlazorApp_Client.Models
 @using BlazorApp_Client.Service
-@inject UserService userService
+@inject UserService UserService
+@inject NavigationManager NavigationManager
 
 <h3>Users</h3>
 
@@ -20,6 +21,7 @@ else
         <tr>
             <th>User ID</th>
             <th>User Name</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -28,22 +30,29 @@ else
             <tr>
                 <td>@user.userId</td>
                 <td>@user.userName</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" @onclick="() => EditUser(user)">Edit</button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.userId)">Delete</button>
+                </td>
             </tr>
         }
         </tbody>
     </table>
-    
-    
+}
+
+<div>
+    <button class="btn btn-success" @onclick="NavigateToAddUserPage">Add User</button>
+</div>
+
 @code {
     private List<User> users;
-    
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
     // Fetch users from the middle-tier API using UserService
-            users = await userService.GetAllUsers();
+            users = await UserService.GetAllUsers();
         }
         catch (Exception ex)
         {
@@ -51,5 +60,21 @@ else
             Console.WriteLine($"Error fetching users: {ex.Message}");
         }
     }
+
+    private void EditUser(User user)
+    {
+    // Handle Edit button click
+    // Implement your logic to navigate to the edit user page.
+    }
+
+    private void DeleteUser(string userId)
+    {
+    // Handle Delete button click
+    // Implement your logic to delete the user from the database.
+    }
+
+    private void NavigateToAddUserPage()
+    {
+        NavigationManager.NavigateTo("/adduser");
     }
 }
