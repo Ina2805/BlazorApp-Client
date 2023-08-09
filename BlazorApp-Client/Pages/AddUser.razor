@@ -30,7 +30,7 @@
         try
         {
             bool res = await UserService.SaveUser(newUser);
-
+            
             if (res)
             {
                 NavigationManager.NavigateTo("/users");

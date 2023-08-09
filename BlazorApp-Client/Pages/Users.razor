@@ -45,32 +45,39 @@ else
 </div>
 
 @code {
-    private List<User> users;
+    private List<User> users = new List<User>();
+    private UserService userService;
+    private NavigationManager navigationManager;
+
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-    // Fetch users from the middle-tier API using UserService
-            users = await UserService.GetAllUsers();
-        }
-        catch (Exception ex)
-        {
-    // Handle any exceptions or errors during data fetching
-            Console.WriteLine($"Error fetching users: {ex.Message}");
-        }
+        userService = new UserService(); // Instantiate your service here
+    // Initialize user list from the database
+        users = await userService.GetAllUsers();
     }
 
-    private void EditUser(User user)
+    private async void EditUser(User user)
     {
-    // Handle Edit button click
-    // Implement your logic to navigate to the edit user page.
+        NavigationManager.NavigateTo($"/edituser/{user.userId}");
+
     }
 
-    private void DeleteUser(string userId)
+    private async Task DeleteUser(string userId)
     {
-    // Handle Delete button click
-    // Implement your logic to delete the user from the database.
+    // Call the user service or data access layer to delete the user
+        bool success = await userService.DeleteUser(userId);
+
+        if (success)
+        {
+    // Remove the deleted user from the user list
+            //var userToDelete = users.FirstOrDefault(u => u.userId == userId);
+            if (success)
+            {
+                users.RemoveAll(user => user.userId == userId);
+            }
+            
+        }
     }
 
     private void NavigateToAddUserPage()

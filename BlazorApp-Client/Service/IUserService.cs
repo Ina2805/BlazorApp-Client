@@ -6,4 +6,5 @@ public interface IUserService
 {
     Task<List<User>> GetAllUsers();
     Task<bool> SaveUser(User user);
+    Task<bool> DeleteUser(String userId);
 }

@@ -34,24 +34,62 @@ public class UserService : IUserService
     public async Task<bool> SaveUser(User user)
     {
         string jsonUser = JsonSerializer.Serialize(user);
-            StringContent content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync(url + "/users", content);
+        StringContent content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
+        HttpResponseMessage response = await httpClient.PostAsync(url + "/users", content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("User Added");
-                return true;
-            }
-            else
-            {
-                Console.WriteLine($@"Error: {response.StatusCode}, {response.ReasonPhrase}");
-                return false;
-            }
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("User Added");
+            return true;
+        }
+        else
+        {
+            Console.WriteLine($@"Error: {response.StatusCode}, {response.ReasonPhrase}");
+            return false;
+        }
     }
-
+    
     public async Task<bool> DeleteUser(string userId)
     {
         HttpResponseMessage responseMessage = await httpClient.DeleteAsync(url + "/user/" + userId);
+
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            string result = await responseMessage.Content.ReadAsStringAsync();
+            bool response = JsonSerializer.Deserialize<bool>(result,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            return response;
+        }
+        else
+        {
+            Console.WriteLine($@"Error: {responseMessage.StatusCode}, {responseMessage.ReasonPhrase}");
+            return false;
+        }
+    }
+
+    public async Task<User> GetUserById(String userId)
+    {
+        HttpResponseMessage responseMessage = await httpClient.GetAsync(url + $"/users/{userId}");
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            string result = await responseMessage.Content.ReadAsStringAsync(); 
+            User user = JsonSerializer.Deserialize<User>(result, new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+            return user;
+        }
+        else
+        {
+            Console.WriteLine($@"Error: {responseMessage.StatusCode}, {responseMessage.ReasonPhrase}");
+            return null;
+        }
+    }
+    public async Task<bool> EditUser(User editedUser)
+    {
+        User user = new User()
+        {
+            userId = editedUser.userId,
+            userName = editedUser.userName
+        };
+        HttpResponseMessage responseMessage = await httpClient.PutAsJsonAsync(url + "/users/edit", user);
 
         if (responseMessage.IsSuccessStatusCode)
         {
